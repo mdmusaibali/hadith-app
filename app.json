@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "hadith-app",
+    "slug": "hadith-app",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/Hadith.png",
+    "scheme": "com.hadith.musaib",
+    "splash": {
+      "image": "./assets/splash1.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#D0BCFF"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#D0BCFF"
+      },
+      "userInterfaceStyle": "automatic",
+      "versionCode": 1,
+      "package": "com.hadith.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b8cbbd1d-8b46-4373-a69e-3a73a98e00a6"
+      }
+    }
+  }
+}
