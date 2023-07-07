@@ -24,7 +24,7 @@
       },
       "userInterfaceStyle": "automatic",
       "versionCode": 1,
-      "package": "com.hadith.app"
+      "package": "com.hadith.musaib"
     },
     "web": {
       "favicon": "./assets/favicon.png"
