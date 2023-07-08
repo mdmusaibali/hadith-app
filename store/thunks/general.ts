@@ -58,13 +58,13 @@ export const getHadiths = createAsyncThunk(
           payload.chapterNumber
         }`
       );
-      console.log(
-        `https://hadithapi.com/api/hadiths/?apiKey=${
-          API_KEY || process.env.API_KEY
-        }&page=${payload.pageNumber}&book=${payload.bookSlug}&chapter=${
-          payload.chapterNumber
-        }`
-      );
+      // console.log(
+      //   `https://hadithapi.com/api/hadiths/?apiKey=${
+      //     API_KEY || process.env.API_KEY
+      //   }&page=${payload.pageNumber}&book=${payload.bookSlug}&chapter=${
+      //     payload.chapterNumber
+      //   }`
+      // );
       const data = response.data;
       return { hadiths: data?.hadiths };
     } catch (error) {

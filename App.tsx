@@ -1,6 +1,7 @@
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, useColorScheme } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 import {
   DarkTheme as NavigationDarkTheme,
   NavigationContainer,
@@ -9,17 +10,20 @@ import {
 import {
   DefaultTheme,
   MD3DarkTheme,
+  Modal,
   PaperProvider,
+  Text,
   adaptNavigationTheme,
 } from "react-native-paper";
 import { Provider as StoreProvider } from "react-redux";
 import { store } from "./store";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getItemFromLocalStorage } from "./util/helper";
 import { settingsActions } from "./store/slice/settings";
 import Navigator from "./navigators/Navigator";
+import { NoInternetModal } from "./components";
 
 const { DarkTheme, LightTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationLightTheme,
@@ -34,6 +38,19 @@ const Root = () => {
   const isDarkMode = colorScheme === "dark";
   const theme = useAppSelector((state) => state.settings.theme);
   const dispatch = useAppDispatch();
+  const [isConnected, setIsConnected] = useState<Boolean | null>(true);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      // console.log("Connection type", state.type);
+      // console.log("Is connected?", state.isConnected);
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -49,31 +66,30 @@ const Root = () => {
     })();
   }, []);
 
+  const NavigationTheme =
+    theme === "System"
+      ? isDarkMode
+        ? DarkTheme
+        : LightTheme
+      : theme === "Light"
+      ? LightTheme
+      : DarkTheme;
+
+  const PaperProviderTheme =
+    theme === "System"
+      ? isDarkMode
+        ? MD3DarkTheme
+        : DefaultTheme
+      : theme === "Light"
+      ? DefaultTheme
+      : MD3DarkTheme;
+
   return (
-    <NavigationContainer
-      theme={
-        theme === "System"
-          ? isDarkMode
-            ? DarkTheme
-            : LightTheme
-          : theme === "Light"
-          ? LightTheme
-          : DarkTheme
-      }
-    >
-      <PaperProvider
-        theme={
-          theme === "System"
-            ? isDarkMode
-              ? MD3DarkTheme
-              : DefaultTheme
-            : theme === "Light"
-            ? DefaultTheme
-            : MD3DarkTheme
-        }
-      >
+    <NavigationContainer theme={NavigationTheme}>
+      <PaperProvider theme={PaperProviderTheme}>
         <StatusBar style="auto" />
         <Navigator />
+        {!isConnected && <NoInternetModal />}
       </PaperProvider>
     </NavigationContainer>
   );
