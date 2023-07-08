@@ -2,7 +2,7 @@
   "expo": {
     "name": "hadith-app",
     "slug": "hadith-app",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/Hadith.png",
     "scheme": "com.hadith.musaib",
@@ -23,7 +23,7 @@
         "backgroundColor": "#D0BCFF"
       },
       "userInterfaceStyle": "automatic",
-      "versionCode": 1,
+      "versionCode": 2,
       "package": "com.hadith.musaib"
     },
     "web": {
