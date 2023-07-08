@@ -1,4 +1,11 @@
-import { View, Text, FlatList, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   HadithsScreenNavigationProp,
@@ -6,7 +13,11 @@ import {
 } from "../navigators/types";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { getHadiths } from "../store/thunks/general";
-import { ActivityIndicator } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Avatar,
+  Text as PaperText,
+} from "react-native-paper";
 import { Hadith as HadithType } from "../types/general";
 import { Hadith } from "../components";
 import { generalActions } from "../store/slice/general";
@@ -56,7 +67,7 @@ const HadithsScreen = ({ route, navigation }: HadithsScreenProps) => {
   }, []);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       {loading && hadiths.length === 0 && (
         <ActivityIndicator size={"large"} style={{ marginTop: 10 }} />
       )}
@@ -85,8 +96,39 @@ const HadithsScreen = ({ route, navigation }: HadithsScreenProps) => {
           renderItem={({ item }) => <Hadith hadith={item} />}
         />
       )}
+      {!loading && hadiths.length === 0 && (
+        <ScrollView
+          contentContainerStyle={styles.empty}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading && hadiths.length === 0}
+              onRefresh={loadHadiths.bind(null, true)}
+            />
+          }
+        >
+          <Avatar.Icon
+            icon={"note-off-outline"}
+            size={100}
+            style={{ marginBottom: 16 }}
+          ></Avatar.Icon>
+          <PaperText variant="headlineMedium" style={{ marginBottom: 6 }}>
+            It's not you. It's us.
+          </PaperText>
+          <PaperText variant="titleSmall">
+            We were not able to find hadith's from this chapter
+          </PaperText>
+        </ScrollView>
+      )}
     </View>
   );
 };
 
 export default HadithsScreen;
+
+const styles = StyleSheet.create({
+  empty: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

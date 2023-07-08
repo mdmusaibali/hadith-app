@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, List, Text as PaperText } from "react-native-paper";
 import { Hadith as HadithType } from "./../../types/general";
 import { StyleSheet, TouchableOpacity, useColorScheme } from "react-native";
@@ -22,6 +22,12 @@ const Hadith = ({ hadith }: HadithProps) => {
       [id]: !prevValues[id as keyof typeof expanded],
     }));
   };
+
+  useEffect(() => {
+    if (!hadith.hadithEnglish && hadith.hadithUrdu) {
+      setExpanded((prev) => ({ ...prev, urdu: true }));
+    }
+  }, []);
 
   return (
     <Card style={styles.hadith}>
@@ -48,7 +54,14 @@ const Hadith = ({ hadith }: HadithProps) => {
             </PaperText>
           )}
           <PaperText variant="bodyMedium">{hadith.englishNarrator}</PaperText>
-          <PaperText variant="bodyLarge">{hadith.hadithEnglish}</PaperText>
+          {hadith.hadithEnglish && (
+            <PaperText variant="bodyLarge">{hadith.hadithEnglish}</PaperText>
+          )}
+          {!hadith.hadithEnglish && (
+            <PaperText variant="bodyLarge">
+              Sorry, english version unavailable.
+            </PaperText>
+          )}
 
           <TouchableOpacity
             style={styles.accordionControl}
@@ -71,7 +84,8 @@ const Hadith = ({ hadith }: HadithProps) => {
           )}
 
           <PaperText style={{ opacity: 0.5 }}>
-            {hadith.book.bookName}, {hadith.book.writerName}, Vol.{hadith.volume}, Chapter {hadith.chapter.chapterNumber}
+            {hadith.book.bookName}, {hadith.book.writerName}, Vol.
+            {hadith.volume}, Chapter {hadith.chapter.chapterNumber}
           </PaperText>
         </List.Section>
       </Card.Content>

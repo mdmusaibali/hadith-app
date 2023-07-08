@@ -51,6 +51,14 @@ export const getHadiths = createAsyncThunk(
   "getHadiths",
   async (payload: getHadithsPayload, { rejectWithValue }) => {
     try {
+      console.log(
+        "CALLED=>",
+        `https://hadithapi.com/api/hadiths/?apiKey=${
+          API_KEY || process.env.API_KEY
+        }&page=${payload.pageNumber}&book=${payload.bookSlug}&chapter=${
+          payload.chapterNumber
+        }`
+      );
       const response = await axios.get(
         `https://hadithapi.com/api/hadiths/?apiKey=${
           API_KEY || process.env.API_KEY
@@ -58,13 +66,7 @@ export const getHadiths = createAsyncThunk(
           payload.chapterNumber
         }`
       );
-      // console.log(
-      //   `https://hadithapi.com/api/hadiths/?apiKey=${
-      //     API_KEY || process.env.API_KEY
-      //   }&page=${payload.pageNumber}&book=${payload.bookSlug}&chapter=${
-      //     payload.chapterNumber
-      //   }`
-      // );
+      console.log("Response recieved");
       const data = response.data;
       return { hadiths: data?.hadiths };
     } catch (error) {
