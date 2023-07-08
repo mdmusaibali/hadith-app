@@ -54,7 +54,14 @@ export const getHadiths = createAsyncThunk(
       const response = await axios.get(
         `https://hadithapi.com/api/hadiths/?apiKey=${
           API_KEY || process.env.API_KEY
-        }&page=${payload.pageNumber}&book=sahih-bukhari&chapter=${
+        }&page=${payload.pageNumber}&book=${payload.bookSlug}&chapter=${
+          payload.chapterNumber
+        }`
+      );
+      console.log(
+        `https://hadithapi.com/api/hadiths/?apiKey=${
+          API_KEY || process.env.API_KEY
+        }&page=${payload.pageNumber}&book=${payload.bookSlug}&chapter=${
           payload.chapterNumber
         }`
       );

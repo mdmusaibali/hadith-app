@@ -8,40 +8,11 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { createStackNavigator } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
-import { useLayoutEffect } from "react";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator<RootStackParamList>();
 
-const tabHiddenRoutes = ["Chapters", "Hadiths"];
-
-const BooksNavigator = ({
-  navigation,
-  route,
-}: {
-  navigation: any;
-  route: any;
-}) => {
-  useLayoutEffect(() => {
-    const routeName = getFocusedRouteNameFromRoute(route);
-    if (routeName && tabHiddenRoutes.includes(routeName)) {
-      navigation.setOptions({ tabBarStyle: { display: "none" } });
-    } else {
-      navigation.setOptions({ tabBarStyle: { display: "flex" } });
-    }
-  }, [navigation, route]);
-
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Books" component={BooksScreen} />
-      <Stack.Screen name="Chapters" component={ChaptersScreen} options={{}} />
-      <Stack.Screen name="Hadiths" component={HadithsScreen} />
-    </Stack.Navigator>
-  );
-};
-
-export default function BottomTab() {
+const TabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -52,13 +23,12 @@ export default function BottomTab() {
       }}
     >
       <Tab.Screen
-        name="Books Navigator"
-        component={BooksNavigator}
+        name="Books"
+        component={BooksScreen}
         options={{
           tabBarIcon: ({ size, color }) => (
             <Feather size={size} name="book-open" color={color} />
           ),
-          headerShown: false,
           tabBarLabel: "Books",
         }}
       />
@@ -72,5 +42,19 @@ export default function BottomTab() {
         }}
       />
     </Tab.Navigator>
+  );
+};
+
+export default function Navigator() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Books"
+        component={TabNavigator}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Chapters" component={ChaptersScreen} />
+      <Stack.Screen name="Hadiths" component={HadithsScreen} />
+    </Stack.Navigator>
   );
 }

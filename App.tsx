@@ -12,7 +12,6 @@ import {
   PaperProvider,
   adaptNavigationTheme,
 } from "react-native-paper";
-import BottomTab from "./navigators/BottomTab";
 import { Provider as StoreProvider } from "react-redux";
 import { store } from "./store";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
@@ -20,6 +19,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { getItemFromLocalStorage } from "./util/helper";
 import { settingsActions } from "./store/slice/settings";
+import Navigator from "./navigators/Navigator";
 
 const { DarkTheme, LightTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationLightTheme,
@@ -73,7 +73,7 @@ const Root = () => {
         }
       >
         <StatusBar style="auto" />
-        <BottomTab />
+        <Navigator />
       </PaperProvider>
     </NavigationContainer>
   );
