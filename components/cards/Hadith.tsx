@@ -31,7 +31,7 @@ const Hadith = ({ hadith }: HadithProps) => {
 
   return (
     <Card style={styles.hadith}>
-      <PaperText style={styles.hadithId}>{hadith.id}</PaperText>
+      <PaperText style={styles.hadithId}>{hadith.hadithNumber}</PaperText>
       <Card.Content>
         <List.Section>
           <TouchableOpacity
