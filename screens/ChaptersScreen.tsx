@@ -6,7 +6,7 @@ import {
 } from "../navigators/types";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { getChapters } from "../store/thunks/general";
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, TextInput } from "react-native-paper";
 import { Chapter } from "../components";
 import { Chapter as ChapterType } from "../types/general";
 
@@ -20,6 +20,29 @@ const ChaptersScreen = ({ route, navigation }: ChaptersScreenProps) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
   const chapters = useAppSelector((state) => state.general.chapters);
+  const [filteredChapters, setFilteredChapters] = useState(chapters);
+
+  useEffect(() => {
+    setFilteredChapters(chapters);
+  }, [chapters]);
+
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const onChangeSearch = (query: string) => {
+    setSearchQuery(query);
+    const newfilteredChapters = chapters.filter(
+      (chapter) =>
+        chapter.chapterNumber
+          .toLowerCase()
+          .trim()
+          .startsWith(query.toLowerCase().trim()) ||
+        chapter.chapterEnglish
+          .toLowerCase()
+          .trim()
+          .startsWith(query.toLowerCase().trim())
+    );
+    setFilteredChapters(newfilteredChapters);
+  };
 
   const fetchChapters = () => {
     dispatch(getChapters({ bookSlug })).finally(() => {
@@ -46,8 +69,17 @@ const ChaptersScreen = ({ route, navigation }: ChaptersScreenProps) => {
       )}
       {!loading && chapters.length !== 0 && (
         <FlatList
-          data={chapters}
-          keyExtractor={(item: ChapterType) => String(item.id)} // TODO: give typings here
+          data={filteredChapters}
+          keyExtractor={(item: ChapterType) => String(item.id)}
+          ListHeaderComponent={
+            <TextInput
+              label="Search"
+              value={searchQuery}
+              onChangeText={onChangeSearch}
+              mode="outlined"
+              style={{ width: "92%", alignSelf: "center", marginVertical: 8 }}
+            />
+          }
           refreshControl={
             <RefreshControl refreshing={loading} onRefresh={fetchChapters} />
           }

@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Card, List, Text as PaperText } from "react-native-paper";
 import { Hadith as HadithType } from "./../../types/general";
-import { StyleSheet, TouchableOpacity, useColorScheme } from "react-native";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "react-native-paper";
+import * as Speech from "expo-speech";
 
 interface HadithProps {
   hadith: HadithType;
@@ -13,8 +19,9 @@ const Hadith = ({ hadith }: HadithProps) => {
     arabic: false,
     urdu: false,
   });
-  const isDarkMode = useColorScheme() === "dark";
   const theme = useTheme();
+  const [isSpeakingEnglish, setIsSpeakingEnglish] = useState(false);
+  const [isSpeakingUrdu, setIsSpeakingUrdu] = useState(false);
 
   const handleExpand = (id: string) => {
     setExpanded((prevValues) => ({
@@ -28,6 +35,29 @@ const Hadith = ({ hadith }: HadithProps) => {
       setExpanded((prev) => ({ ...prev, urdu: true }));
     }
   }, []);
+
+  const onSpeakStop = (language: "en" | "ur") => {
+    language === "en" ? setIsSpeakingEnglish(false) : setIsSpeakingUrdu(false);
+  };
+
+  const stopSpeech = async () => {
+    await Speech.stop();
+  };
+
+  const speak = async (
+    content: string,
+    language: "en" | "ur",
+    voice: string
+  ) => {
+    await stopSpeech();
+    Speech.speak(content, {
+      language: language,
+      voice: voice,
+      onStopped: onSpeakStop.bind(null, language),
+      onDone: onSpeakStop.bind(null, language),
+    });
+    language === "en" ? setIsSpeakingEnglish(true) : setIsSpeakingUrdu(true);
+  };
 
   return (
     <Card style={styles.hadith}>
@@ -45,7 +75,7 @@ const Hadith = ({ hadith }: HadithProps) => {
             </PaperText>
             <Feather
               name={expanded.arabic ? "chevron-up" : "chevron-down"}
-              color={isDarkMode ? "white" : "black"}
+              color={theme.colors.onSurface}
             />
           </TouchableOpacity>
           {expanded.arabic && (
@@ -55,7 +85,38 @@ const Hadith = ({ hadith }: HadithProps) => {
           )}
           <PaperText variant="bodyMedium">{hadith.englishNarrator}</PaperText>
           {hadith.hadithEnglish && (
-            <PaperText variant="bodyLarge">{hadith.hadithEnglish}</PaperText>
+            <>
+              <PaperText variant="bodyLarge">{hadith.hadithEnglish}</PaperText>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 8,
+                }}
+              >
+                <Feather
+                  name={isSpeakingEnglish ? "volume-x" : "volume-2"}
+                  size={24}
+                  onPress={() => {
+                    if (!isSpeakingEnglish)
+                      speak(hadith.hadithEnglish, "en", "en-us-x-tpd-network");
+                    else stopSpeech();
+                  }}
+                  disabled={hadith.hadithEnglish.length > 4000}
+                  style={{
+                    marginRight: 8,
+                    alignSelf: "flex-start",
+                    opacity: hadith.hadithEnglish.length > 4000 ? 0.3 : 1,
+                  }}
+                  color={theme.colors.onSurface}
+                />
+                {hadith.hadithEnglish.length > 4000 && (
+                  <PaperText style={{ opacity: 0.3 }}>
+                    Too long to speak, sorry.
+                  </PaperText>
+                )}
+              </View>
+            </>
           )}
           {!hadith.hadithEnglish && (
             <PaperText variant="bodyLarge">
@@ -74,13 +135,44 @@ const Hadith = ({ hadith }: HadithProps) => {
             </PaperText>
             <Feather
               name={expanded.urdu ? "chevron-up" : "chevron-down"}
-              color={isDarkMode ? "white" : "black"}
+              color={theme.colors.onSurface}
             />
           </TouchableOpacity>
+
           {expanded.urdu && (
-            <PaperText variant="headlineSmall" style={styles.hadithUrdu}>
-              {hadith.hadithUrdu}
-            </PaperText>
+            <>
+              <PaperText variant="headlineSmall" style={styles.hadithUrdu}>
+                {hadith.hadithUrdu}
+              </PaperText>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginVertical: 8,
+                }}
+              >
+                <Feather
+                  name={isSpeakingUrdu ? "volume-x" : "volume-2"}
+                  size={24}
+                  onPress={() => {
+                    if (!isSpeakingUrdu)
+                      speak(hadith.hadithUrdu, "ur", "ur-pk-x-urm-network");
+                    else stopSpeech();
+                  }}
+                  disabled={hadith.hadithUrdu.length > 4000}
+                  style={{
+                    marginRight: 8,
+                    opacity: hadith.hadithUrdu.length > 4000 ? 0.3 : 1,
+                  }}
+                  color={theme.colors.onSurface}
+                />
+                {hadith.hadithUrdu.length > 4000 && (
+                  <PaperText style={{ opacity: 0.3 }}>
+                    Too long to speak, sorry.
+                  </PaperText>
+                )}
+              </View>
+            </>
           )}
 
           <PaperText style={{ opacity: 0.5 }}>
@@ -93,7 +185,7 @@ const Hadith = ({ hadith }: HadithProps) => {
   );
 };
 
-export default Hadith;
+export default memo(Hadith);
 
 const styles = StyleSheet.create({
   hadithArabic: { textAlign: "right", marginVertical: 16 },
@@ -106,6 +198,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end",
     gap: 3,
+    marginBottom: 8,
+    alignSelf: "flex-end",
   },
   accordionTitle: {
     fontWeight: "700",
