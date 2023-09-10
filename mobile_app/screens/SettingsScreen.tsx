@@ -1,8 +1,20 @@
-import { TouchableOpacity, View } from "react-native";
+import { Button, TouchableOpacity, View } from "react-native";
 import { List, RadioButton, Text } from "react-native-paper";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { Theme, settingsActions } from "../store/slice/settings";
 import { storeItemInLocalStorage } from "../util/helper";
+import notifee, {
+  AndroidStyle,
+  IntervalTrigger,
+  TriggerType,
+  TimeUnit,
+} from "@notifee/react-native";
+
+const trigger: IntervalTrigger = {
+  type: TriggerType.INTERVAL,
+  interval: 15,
+  timeUnit: TimeUnit.MINUTES,
+};
 
 const SettingsScreen = () => {
   const theme = useAppSelector((state) => state.settings.theme);
