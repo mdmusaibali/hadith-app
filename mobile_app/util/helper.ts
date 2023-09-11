@@ -10,9 +10,12 @@ export const decodeString = (str: string) => {
   });
 };
 
-export const storeItemInLocalStorage = async (key: string, val: string) => {
+export const storeItemInLocalStorage = async (
+  key: string,
+  val: string | Boolean
+) => {
   try {
-    await AsyncStorage.setItem(key, val);
+    await AsyncStorage.setItem(key, String(val));
   } catch (e) {
     // saving error
   }
