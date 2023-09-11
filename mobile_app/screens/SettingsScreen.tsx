@@ -48,7 +48,7 @@ const SettingsScreen = () => {
         }
         if (response === "never_ask_again") {
           ToastAndroid.show(
-            "Please enable notifications from settings",
+            "Please enable notifications from settings if already not done.",
             ToastAndroid.LONG
           );
         }

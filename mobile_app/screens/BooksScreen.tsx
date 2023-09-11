@@ -6,6 +6,7 @@ import { getBooks } from "../store/thunks/general";
 import { Book } from "../components";
 import { BooksScreenNavigationProp } from "../navigators/types";
 import { Book as BookType } from "../types/general";
+import messaging from "@react-native-firebase/messaging";
 
 interface BooksScreenProps {
   navigation: BooksScreenNavigationProp;
@@ -21,6 +22,40 @@ const BooksScreen = ({ navigation }: BooksScreenProps) => {
   useEffect(() => {
     setFilteredBooks(books);
   }, [books]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        // trigerred when app is opened by clicking on notification when app is in killed state
+        const notification = await messaging().getInitialNotification();
+        if (notification && notification.notification) {
+          const hadith = notification.notification.body;
+          const imgUrl = notification.notification.android?.imageUrl;
+          if (hadith && imgUrl) {
+            navigation.navigate("Daily", { hadith, imgUrl });
+          }
+          console.log("getInitialNotification: hadith", hadith);
+          console.log("getInitialNotification: imgUrl", imgUrl);
+        }
+      } catch (error) {
+        console.log("Error: getInitialNotification");
+      }
+    })();
+    // trigerred when app is opened by clicking on notification when app is in background state
+    const unsubscribe = messaging().onNotificationOpenedApp((notification) => {
+      if (notification && notification.notification) {
+        const hadith = notification.notification.body;
+        const imgUrl = notification.notification.android?.imageUrl;
+        if (hadith && imgUrl) {
+          navigation.navigate("Daily", { hadith, imgUrl });
+        }
+        console.log("onNotificationOpenedApp: hadith", hadith);
+        console.log("onNotificationOpenedApp: imgUrl", imgUrl);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   const onChangeSearch = (query: string) => {
     setSearchQuery(query);

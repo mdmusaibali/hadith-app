@@ -8,6 +8,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { createStackNavigator } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
+import DailyHadith from "../screens/DailyHadith";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator<RootStackParamList>();
@@ -52,6 +53,11 @@ export default function Navigator() {
         name="Books"
         component={TabNavigator}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Daily"
+        component={DailyHadith}
+        options={{ headerTitle: "Daily Hadith" }}
       />
       <Stack.Screen name="Chapters" component={ChaptersScreen} />
       <Stack.Screen name="Hadiths" component={HadithsScreen} />

@@ -7,11 +7,14 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import { onRequest } from "firebase-functions/v1/https";
+// import { onRequest } from "firebase-functions/v1/https";
 import { pubsub, config } from "firebase-functions";
-import axios from "axios";
-import { messaging } from "firebase-admin";
 import * as admin from "firebase-admin";
+import {
+  getRandomHadith,
+  getUnsplashImageUrl,
+  sendMessage,
+} from "./utils/helpers";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -26,31 +29,31 @@ exports.sendDailyNotification = pubsub
   .timeZone("Asia/Kolkata")
   .onRun(async (context) => {
     try {
-      // get hadith
-      const apiResponse = await axios.get(
-        "https://api.sunnah.com/v1/hadiths/random",
-        {
-          headers: {
-            "X-API-Key": process.env.HADITH_API_KEY,
-          },
+      // get hadith (Hadith api)
+      const randomHadith = await getRandomHadith();
+      // get unsplash url
+      const imgUrl = await getUnsplashImageUrl();
+      // doing this because fcm supports max payload size of 4kb and then there's imgUrl and title.
+      // empty string check
+      if (randomHadith) {
+        // payload length check
+        if (randomHadith.length > 3500) {
+          // if exceeds 3500 then get new hadith and send
+          const newRandomHadith = await getRandomHadith();
+          if (newRandomHadith) {
+            sendMessage(newRandomHadith, imgUrl);
+          }
+        } else {
+          // else send the current one
+          sendMessage(randomHadith, imgUrl);
         }
-      );
-      const notificationData = apiResponse.data;
-      const hadith = notificationData?.hadith[0].body;
-
-      //get random unsplash image
-      const unsplashResponse = await axios.get(
-        `https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}&query=nature&orientation=landscape`
-      );
-      const unsplashData = unsplashResponse.data;
-      const imgUrl = unsplashData?.urls?.small;
-
-      messaging().sendToTopic("hadith", {
-        data: {
-          hadith,
-          image: imgUrl,
-        },
-      });
+      } else {
+        // if empty string then get new hadith and send
+        const newRandomHadith = await getRandomHadith();
+        if (newRandomHadith) {
+          sendMessage(newRandomHadith, imgUrl);
+        }
+      }
       return null;
     } catch (error) {
       console.log("Something went wrong", error);
@@ -58,36 +61,34 @@ exports.sendDailyNotification = pubsub
     }
   });
 
-exports.sendNotification = onRequest(async (req, res) => {
-  try {
-    // get hadith
-    const apiResponse = await axios.get(
-      "https://api.sunnah.com/v1/hadiths/random",
-      {
-        headers: {
-          "X-API-Key": process.env.HADITH_API_KEY,
-        },
-      }
-    );
-    const notificationData = apiResponse.data;
-    const hadith = notificationData?.hadith[0].body;
-
-    //get random unsplash image
-    const unsplashResponse = await axios.get(
-      `https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}&query=nature&orientation=landscape`
-    );
-    const unsplashData = unsplashResponse.data;
-    const imgUrl = unsplashData?.urls?.small;
-
-    messaging().sendToTopic("hadith", {
-      data: {
-        hadith,
-        image: imgUrl,
-      },
-    });
-    res.send("Notification sent");
-  } catch (error) {
-    console.log("Something went wrong", error);
-    res.status(500).send(error);
-  }
-});
+// This function is for manual testing. Must be commented/removed later
+// exports.sendNotification = onRequest(async (req, res) => {
+//   try {
+//     // get hadith (Hadith api)
+//     const randomHadith = await getRandomHadith();
+//     // get unsplash url
+//     const imgUrl = await getUnsplashImageUrl();
+//     // doing this because fcm supports max payload size of 4kb and then there's imgUrl and title.
+//     if (randomHadith) {
+//       if (randomHadith.length > 3500) {
+//         const newRandomHadith = await getRandomHadith();
+//         if (newRandomHadith) {
+//           sendMessage(newRandomHadith, imgUrl);
+//         }
+//       } else {
+//         sendMessage(randomHadith, imgUrl);
+//       }
+//     } else {
+//       const newRandomHadith = await getRandomHadith();
+//       if (newRandomHadith) {
+//         sendMessage(newRandomHadith, imgUrl);
+//       }
+//     }
+//     res.send("Notification sent");
+//     return;
+//   } catch (error) {
+//     console.log("Something went wrong", error);
+//     res.status(500).send(error);
+//     return;
+//   }
+// });
