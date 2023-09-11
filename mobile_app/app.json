@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#D0BCFF"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.hadith.musaib"
@@ -25,8 +23,10 @@
       },
       "userInterfaceStyle": "automatic",
       "versionCode": 5,
-      "package": "com.hadith.musaib"
+      "package": "com.hadith.musaib",
+      "googleServicesFile": "./google-services.json"
     },
+    "plugins": ["@react-native-firebase/app"],
     "web": {
       "favicon": "./assets/favicon.png"
     },

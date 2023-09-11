@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "584636077714",
+    "project_id": "hadith-app-7b89d",
+    "storage_bucket": "hadith-app-7b89d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584636077714:android:404e6319d65498d606784b",
+        "android_client_info": {
+          "package_name": "com.hadith.musaib"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH3cfw-STrAthkFGSRg7lCGRpfnNFrV_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

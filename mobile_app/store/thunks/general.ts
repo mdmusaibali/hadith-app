@@ -12,10 +12,9 @@ export const getBooks = createAsyncThunk(
   "getBooks",
   async (_, { rejectWithValue }) => {
     try {
+      const api_key = API_KEY || process.env.API_KEY;
       const response = await axios.get(
-        `https://hadithapi.com/api/books?apiKey=${
-          API_KEY || process.env.API_KEY
-        }`
+        `https://hadithapi.com/api/books?apiKey=${api_key}`
       );
       const data = response.data;
       return { books: data?.books };
