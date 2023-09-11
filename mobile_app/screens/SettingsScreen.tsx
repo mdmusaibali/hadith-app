@@ -11,19 +11,8 @@ import {
   getItemFromLocalStorage,
   storeItemInLocalStorage,
 } from "../util/helper";
-import notifee, {
-  IntervalTrigger,
-  TriggerType,
-  TimeUnit,
-} from "@notifee/react-native";
 import { useEffect, useState } from "react";
 import { firebase } from "@react-native-firebase/messaging";
-
-const trigger: IntervalTrigger = {
-  type: TriggerType.INTERVAL,
-  interval: 15,
-  timeUnit: TimeUnit.MINUTES,
-};
 
 const SettingsScreen = () => {
   const theme = useAppSelector((state) => state.settings.theme);
@@ -62,22 +51,29 @@ const SettingsScreen = () => {
             "Please enable notifications from settings",
             ToastAndroid.LONG
           );
-          return;
         }
         // const token = await defaultAppMessaging.getToken();
         const subscription = await defaultAppMessaging.subscribeToTopic(
           "hadith"
         );
-        setIsSwitchOn(true);
         ToastAndroid.show(
           "You are now subscribed to daily hadiths",
           ToastAndroid.LONG
         );
         await storeItemInLocalStorage("isSubscribed", true);
+        setIsSwitchOn(true);
         console.log(subscription);
       }
     } catch (error) {
-      ToastAndroid.show("Something went wrong", ToastAndroid.SHORT);
+      if (error instanceof Error) {
+        ToastAndroid.show(
+          `Something went wrong ${error.message}`,
+          ToastAndroid.SHORT
+        );
+      } else {
+        ToastAndroid.show(`Something went wrong`, ToastAndroid.SHORT);
+      }
+      console.log(error);
     }
     setSettingFcmNoti(false);
   };

@@ -8,19 +8,25 @@
  */
 
 import { onRequest } from "firebase-functions/v1/https";
-import { pubsub } from "firebase-functions";
+import { pubsub, config } from "firebase-functions";
 import axios from "axios";
 import { messaging } from "firebase-admin";
+import * as admin from "firebase-admin";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
+try {
+  admin.initializeApp(config().firebase);
+} catch (error) {
+  console.log("Error initialising", error);
+}
 
 exports.sendDailyNotification = pubsub
-  .schedule("*/30 * * * *")
+  .schedule("0 9 * * *")
   .timeZone("Asia/Kolkata")
   .onRun(async (context) => {
     try {
-      // Fetch data from your API
+      // get hadith
       const apiResponse = await axios.get(
         "https://api.sunnah.com/v1/hadiths/random",
         {
@@ -30,33 +36,31 @@ exports.sendDailyNotification = pubsub
         }
       );
       const notificationData = apiResponse.data;
-      console.log(notificationData);
+      const hadith = notificationData?.hadith[0].body;
 
-      // TODO: Send notification using FCM
-      //   const message = {
-      //     data: {
-      //       // Include data from the API in the notification
-      //       key1: notificationData.someKey,
-      //       key2: notificationData.anotherKey,
-      //     },
-      //     notification: {
-      //       title: "Daily Notification",
-      //       body: "Your notification body goes here",
-      //     },
-      //     // Add tokens or topic to target specific devices or a group of devices
-      //     tokens: ["", ""],
-      //     condition: "",
-      //   };
+      //get random unsplash image
+      const unsplashResponse = await axios.get(
+        `https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}&query=nature&orientation=landscape`
+      );
+      const unsplashData = unsplashResponse.data;
+      const imgUrl = unsplashData?.urls?.small;
 
+      messaging().sendToTopic("hadith", {
+        data: {
+          hadith,
+          image: imgUrl,
+        },
+      });
       return null;
     } catch (error) {
-      console.error("Error sending notification:", error);
+      console.log("Something went wrong", error);
       return null;
     }
   });
 
 exports.sendNotification = onRequest(async (req, res) => {
   try {
+    // get hadith
     const apiResponse = await axios.get(
       "https://api.sunnah.com/v1/hadiths/random",
       {
@@ -68,13 +72,20 @@ exports.sendNotification = onRequest(async (req, res) => {
     const notificationData = apiResponse.data;
     const hadith = notificationData?.hadith[0].body;
 
-    messaging().sendToTopic("all", {
-      data: apiResponse.data,
-      notification: {
-        title: "Your daily hadith from Hadith Pro",
-        body: hadith,
+    //get random unsplash image
+    const unsplashResponse = await axios.get(
+      `https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}&query=nature&orientation=landscape`
+    );
+    const unsplashData = unsplashResponse.data;
+    const imgUrl = unsplashData?.urls?.small;
+
+    messaging().sendToTopic("hadith", {
+      data: {
+        hadith,
+        image: imgUrl,
       },
     });
+    res.send("Notification sent");
   } catch (error) {
     console.log("Something went wrong", error);
     res.status(500).send(error);
