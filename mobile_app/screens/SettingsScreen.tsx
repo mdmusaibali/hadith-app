@@ -1,75 +1,36 @@
-import {
-  TouchableOpacity,
-  View,
-  PermissionsAndroid,
-  ToastAndroid,
-} from "react-native";
+import { TouchableOpacity, View, ToastAndroid } from "react-native";
 import { List, RadioButton, Text, Switch } from "react-native-paper";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { Theme, settingsActions } from "../store/slice/settings";
 import {
   getItemFromLocalStorage,
+  handleNotificationPermissions,
   storeItemInLocalStorage,
+  subscribeForDailyHadiths,
+  unsubscribeFromDailyHadiths,
 } from "../util/helper";
 import { useEffect, useState } from "react";
-import { firebase } from "@react-native-firebase/messaging";
 
 const SettingsScreen = () => {
   const theme = useAppSelector((state) => state.settings.theme);
   const dispatch = useAppDispatch();
   const [isSwitchOn, setIsSwitchOn] = useState(false);
   const [settingFcmNoti, setSettingFcmNoti] = useState(false);
-  const defaultAppMessaging = firebase.messaging();
 
   const onToggleSwitch = async () => {
     setSettingFcmNoti(true);
     try {
       if (isSwitchOn) {
-        const unSubscribe = await defaultAppMessaging.unsubscribeFromTopic(
-          "hadith"
-        );
-        ToastAndroid.show(
-          "You have unsubscribed from daily hadiths",
-          ToastAndroid.LONG
-        );
-        console.log(unSubscribe);
-        await storeItemInLocalStorage("isSubscribed", false);
+        await unsubscribeFromDailyHadiths();
         setIsSwitchOn(false);
       } else {
-        const response = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-        );
-        if (response === "denied") {
-          ToastAndroid.show(
-            "Need notifications permission for this",
-            ToastAndroid.SHORT
-          );
-          return;
-        }
-        if (response === "never_ask_again") {
-          ToastAndroid.show(
-            "Please enable notifications from settings if already not done.",
-            ToastAndroid.LONG
-          );
-        }
-        // const token = await defaultAppMessaging.getToken();
-        const subscription = await defaultAppMessaging.subscribeToTopic(
-          "hadith"
-        );
-        ToastAndroid.show(
-          "You are now subscribed to daily hadiths",
-          ToastAndroid.LONG
-        );
-        await storeItemInLocalStorage("isSubscribed", true);
+        await handleNotificationPermissions();
+        await subscribeForDailyHadiths();
         setIsSwitchOn(true);
-        console.log(subscription);
       }
     } catch (error) {
       if (error instanceof Error) {
-        ToastAndroid.show(
-          `Something went wrong ${error.message}`,
-          ToastAndroid.SHORT
-        );
+        ToastAndroid.show(error.message, ToastAndroid.SHORT);
       } else {
         ToastAndroid.show(`Something went wrong`, ToastAndroid.SHORT);
       }

@@ -20,7 +20,12 @@ import { store } from "./store";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
-import { getItemFromLocalStorage } from "./util/helper";
+import {
+  getItemFromLocalStorage,
+  handleNotificationPermissions,
+  storeItemInLocalStorage,
+  subscribeForDailyHadiths,
+} from "./util/helper";
 import { settingsActions } from "./store/slice/settings";
 import Navigator from "./navigators/Navigator";
 import { NoInternetModal } from "./components";
@@ -42,8 +47,6 @@ const Root = () => {
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      // console.log("Connection type", state.type);
-      // console.log("Is connected?", state.isConnected);
       setIsConnected(state.isConnected);
     });
 
@@ -53,6 +56,7 @@ const Root = () => {
   }, []);
 
   useEffect(() => {
+    // handling theme switching
     (async () => {
       const theme = await getItemFromLocalStorage("theme");
       if (!theme) dispatch(settingsActions.setTheme({ theme: "System" }));
@@ -63,6 +67,21 @@ const Root = () => {
       if (theme === "Dark")
         dispatch(settingsActions.setTheme({ theme: "Dark" }));
       await SplashScreen.hideAsync();
+    })();
+
+    // auto subscribe at first
+    (async () => {
+      const firstTimeSubscribed = await getItemFromLocalStorage("initSub");
+      console.log("initSub status: ", firstTimeSubscribed);
+      if (!firstTimeSubscribed) {
+        try {
+          await handleNotificationPermissions();
+          await subscribeForDailyHadiths(true);
+          await storeItemInLocalStorage("initSub", true);
+        } catch (error) {
+          console.log("Error initSub", error);
+        }
+      }
     })();
   }, []);
 

@@ -57,7 +57,7 @@ const HadithsScreen = ({ route, navigation }: HadithsScreenProps) => {
     setLoading(true);
     dispatch(
       getHadiths({ bookSlug, chapterNumber, pageNumber: String(pageNumber) })
-    ).finally(() => {
+    ).then(() => {
       setLoading(false);
     });
   };

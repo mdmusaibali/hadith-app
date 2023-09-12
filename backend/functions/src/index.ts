@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-// import { onRequest } from "firebase-functions/v1/https";
+import { onRequest } from "firebase-functions/v1/https";
 import { pubsub, config } from "firebase-functions";
 import * as admin from "firebase-admin";
 import {
@@ -62,33 +62,33 @@ exports.sendDailyNotification = pubsub
   });
 
 // This function is for manual testing. Must be commented/removed later
-// exports.sendNotification = onRequest(async (req, res) => {
-//   try {
-//     // get hadith (Hadith api)
-//     const randomHadith = await getRandomHadith();
-//     // get unsplash url
-//     const imgUrl = await getUnsplashImageUrl();
-//     // doing this because fcm supports max payload size of 4kb and then there's imgUrl and title.
-//     if (randomHadith) {
-//       if (randomHadith.length > 3500) {
-//         const newRandomHadith = await getRandomHadith();
-//         if (newRandomHadith) {
-//           sendMessage(newRandomHadith, imgUrl);
-//         }
-//       } else {
-//         sendMessage(randomHadith, imgUrl);
-//       }
-//     } else {
-//       const newRandomHadith = await getRandomHadith();
-//       if (newRandomHadith) {
-//         sendMessage(newRandomHadith, imgUrl);
-//       }
-//     }
-//     res.send("Notification sent");
-//     return;
-//   } catch (error) {
-//     console.log("Something went wrong", error);
-//     res.status(500).send(error);
-//     return;
-//   }
-// });
+exports.sendNotification = onRequest(async (req, res) => {
+  try {
+    // get hadith (Hadith api)
+    const randomHadith = await getRandomHadith();
+    // get unsplash url
+    const imgUrl = await getUnsplashImageUrl();
+    // doing this because fcm supports max payload size of 4kb and then there's imgUrl and title.
+    if (randomHadith) {
+      if (randomHadith.length > 3500) {
+        const newRandomHadith = await getRandomHadith();
+        if (newRandomHadith) {
+          sendMessage(newRandomHadith, imgUrl);
+        }
+      } else {
+        sendMessage(randomHadith, imgUrl);
+      }
+    } else {
+      const newRandomHadith = await getRandomHadith();
+      if (newRandomHadith) {
+        sendMessage(newRandomHadith, imgUrl);
+      }
+    }
+    res.send("Notification sent");
+    return;
+  } catch (error) {
+    console.log("Something went wrong", error);
+    res.status(500).send(error);
+    return;
+  }
+});

@@ -39,13 +39,19 @@ export const getRandomHadith = async () => {
     const randomHadithObj = pickRandomItem(hadithData);
     const englishNarrator = randomHadithObj?.englishNarrator;
     const hadithEnglish = randomHadithObj?.hadithEnglish;
+    const volume = randomHadithObj?.volume;
+    const hadithNumber = randomHadithObj?.hadithNumber;
+    const bookName = randomHadithObj?.book?.bookName;
     let randomHadithString: string;
     if (englishNarrator) {
       randomHadithString = englishNarrator + " " + hadithEnglish;
     } else {
       randomHadithString = hadithEnglish;
     }
-    return randomHadithString.trim();
+    return (
+      randomHadithString.trim() +
+      `\n\n(${bookName || ""} vol.${volume || ""} #${hadithNumber || ""})`
+    );
   }
   return null;
 };
@@ -66,6 +72,9 @@ export const sendMessage = (body: string, image: string) => {
       title: "Daily hadith by Hadith Pro",
       body: body,
       imageUrl: image,
+    },
+    android: {
+      priority: "high",
     },
   });
 };

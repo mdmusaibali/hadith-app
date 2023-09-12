@@ -45,7 +45,7 @@ const ChaptersScreen = ({ route, navigation }: ChaptersScreenProps) => {
   };
 
   const fetchChapters = () => {
-    dispatch(getChapters({ bookSlug })).finally(() => {
+    dispatch(getChapters({ bookSlug })).then(() => {
       setLoading(false);
     });
   };

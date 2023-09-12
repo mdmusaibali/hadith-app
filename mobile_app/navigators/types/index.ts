@@ -2,7 +2,7 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
 
 export type RootStackParamList = {
-  Books: undefined;
+  BooksNested: undefined;
   Daily: { hadith: string; imgUrl: string };
   Chapters: { bookSlug: string };
   Hadiths: { bookSlug: string; chapterEnglish: string; chapterNumber: string };
@@ -10,7 +10,7 @@ export type RootStackParamList = {
 
 export type BooksScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "Books"
+  "BooksNested"
 >;
 export type ChaptersScreenNavigationProp = StackNavigationProp<
   RootStackParamList,

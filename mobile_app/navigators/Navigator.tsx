@@ -50,9 +50,9 @@ export default function Navigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Books"
+        name="BooksNested"
         component={TabNavigator}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, headerTitle: "Books" }}
       />
       <Stack.Screen
         name="Daily"
