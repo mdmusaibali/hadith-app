@@ -58,7 +58,7 @@ export const getRandomHadith = async () => {
 
 export const getUnsplashImageUrl = async () => {
   const unsplashResponse = await axios.get(
-    `https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}&query=nature&orientation=landscape`
+    `https://api.unsplash.com/photos/random/?client_id=${process.env.UNSPLASH_ACCESS_KEY}&query=nature&orientation=portrait`
   );
   const unsplashData = unsplashResponse.data;
   const imgUrl = unsplashData?.urls?.small;

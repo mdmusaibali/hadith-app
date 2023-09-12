@@ -37,7 +37,7 @@ exports.sendDailyNotification = pubsub
       // empty string check
       if (randomHadith) {
         // payload length check
-        if (randomHadith.length > 3500) {
+        if (randomHadith.length > 3500 || randomHadith.length < 85) {
           // if exceeds 3500 then get new hadith and send
           const newRandomHadith = await getRandomHadith();
           if (newRandomHadith) {
@@ -61,16 +61,25 @@ exports.sendDailyNotification = pubsub
     }
   });
 
-// This function is for manual testing. Must be commented/removed later
+// This function is for manual testing only. Please do not misuse.
 exports.sendNotification = onRequest(async (req, res) => {
   try {
+    const paramKey = req.query?.key;
+    if (!paramKey) {
+      res.send("Please send trigger key");
+      return;
+    }
+    if (paramKey !== process.env.TRIGGER_KEY) {
+      res.send("Invalid trigger key");
+      return;
+    }
     // get hadith (Hadith api)
     const randomHadith = await getRandomHadith();
     // get unsplash url
     const imgUrl = await getUnsplashImageUrl();
     // doing this because fcm supports max payload size of 4kb and then there's imgUrl and title.
     if (randomHadith) {
-      if (randomHadith.length > 3500) {
+      if (randomHadith.length > 3500 || randomHadith.length < 85) {
         const newRandomHadith = await getRandomHadith();
         if (newRandomHadith) {
           sendMessage(newRandomHadith, imgUrl);
