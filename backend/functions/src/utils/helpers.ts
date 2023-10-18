@@ -78,3 +78,21 @@ export const sendMessage = (body: string, image: string) => {
     },
   });
 };
+
+export const sendCustomMessage = (
+  title: string,
+  body: string,
+  image: string
+) => {
+  messaging().send({
+    topic: "hadith",
+    notification: {
+      title: title,
+      body: body,
+      imageUrl: image,
+    },
+    android: {
+      priority: "high",
+    },
+  });
+};

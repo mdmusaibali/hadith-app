@@ -13,6 +13,7 @@ import * as admin from "firebase-admin";
 import {
   getRandomHadith,
   getUnsplashImageUrl,
+  sendCustomMessage,
   sendMessage,
 } from "./utils/helpers";
 
@@ -98,6 +99,33 @@ exports.sendNotification = onRequest(async (req, res) => {
   } catch (error) {
     console.log("Something went wrong", error);
     res.status(500).send(error);
+    return;
+  }
+});
+
+exports.sendCustomNotification = onRequest(async (req, res) => {
+  try {
+    const paramKey = req.query?.key;
+    if (!paramKey) {
+      res.send("Please send trigger key");
+      return;
+    }
+    if (paramKey !== process.env.TRIGGER_KEY) {
+      res.send("Invalid trigger key");
+      return;
+    }
+
+    const { imageUrl, title, body } = req.body;
+    if (!imageUrl || !title || !body) {
+      throw new Error("Please send imageUrl, title and body");
+    }
+
+    sendCustomMessage(title, body, imageUrl);
+    res.send("Notification sent.")
+    return;
+  } catch (error) {
+    if (error instanceof Error) res.status(500).send(error.message);
+    else res.status(500).send("Something went wrong");
     return;
   }
 });
