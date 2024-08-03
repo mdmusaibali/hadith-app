@@ -2,7 +2,7 @@
   "expo": {
     "name": "Hadith Pro",
     "slug": "hadith-app",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/Hadith.png",
     "scheme": "com.hadith.musaib",
@@ -22,7 +22,7 @@
         "backgroundColor": "#D0BCFF"
       },
       "userInterfaceStyle": "automatic",
-      "versionCode": 7,
+      "versionCode": 8,
       "package": "com.hadith.musaib",
       "googleServicesFile": "./google-services.json"
     },
