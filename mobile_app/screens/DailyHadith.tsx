@@ -9,8 +9,9 @@ import { useRef, useState } from "react";
 import { FAB, Portal } from "react-native-paper";
 import { DailyHadithScreenRouteProp } from "../navigators/types";
 import ViewShot from "react-native-view-shot";
+import { isRunningInExpoGo } from "expo"
 // import * as Sharing from "expo-sharing";
-import Sharing from "react-native-share";
+// import Sharing from "react-native-share";
 
 interface DailyHadithScreenProps {
   route: DailyHadithScreenRouteProp;
@@ -40,7 +41,10 @@ const DailyHadith = ({ route }: DailyHadithScreenProps) => {
         url: "file://" + uri,
         filename: "hadith", // only for base64 file in Android
       };
-      Sharing.open(shareOptions);
+      if(!isRunningInExpoGo()){
+        const Sharing = require("react-native-share").default;
+        await Sharing.open(shareOptions);
+      }
     } catch (error) {
       ToastAndroid.show("Something went wrong", ToastAndroid.SHORT);
       console.log(error);

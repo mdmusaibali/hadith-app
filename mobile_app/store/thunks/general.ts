@@ -17,6 +17,7 @@ export const getBooks = createAsyncThunk(
         `https://hadithapi.com/api/books?apiKey=${api_key}`
       );
       const data = response.data;
+      console.log("data", data);
       return { books: data?.books };
     } catch (error) {
       return rejectWithValue("Something went wrong");

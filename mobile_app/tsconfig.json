@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "typeRoots": ["./types"],
-    "lib": [ "es2015" ]
+    "lib": [ "es2015" ],
+    "jsx": "react-native"
   }
 }
